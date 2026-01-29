@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử Tài Kiến Thức Tết Nguyên Đán</title>
+    <style>
+        :root {
+            --primary-color: #d32f2f; /* Đỏ Tết */
+            --secondary-color: #ffca28; /* Vàng Mai */
+            --text-color: #333;
+            --bg-color: #fff8e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            background-image: radial-gradient(#ffca28 10%, transparent 11%), radial-gradient(#ffca28 10%, transparent 11%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .quiz-container {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            overflow: hidden;
+            border: 2px solid var(--secondary-color);
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--secondary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-section {
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .hint-text {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background-color: #fff;
+            border: 2px solid #ddd;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #f9f9f9;
+            border-color: var(--primary-color);
+        }
+
+        .option-btn.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .option-btn.wrong {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            border-radius: 4px;
+            display: none; /* Ẩn mặc định */
+        }
+
+        .footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .score-display {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        #next-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: none; /* Ẩn cho đến khi chọn đáp án */
+        }
+
+        #next-btn:hover {
+            background-color: #b71c1c;
+        }
+
+        /* Kết quả cuối cùng */
+        .result-screen {
+            text-align: center;
+            display: none;
+        }
+
+        .result-score {
+            font-size: 48px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .restart-btn {
+            background-color: var(--secondary-color);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-screen">
+        <div class="header">
+            <h1>🌸 Đố Vui Ngày Tết 🌸</h1>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+        </div>
+
+        <div class="question-section">
+            <div class="question-text" id="question">Đang tải câu hỏi...</div>
+            <div class="hint-text" id="hint">💡 Gợi ý: ...</div>
+            <div class="options-list" id="options">
+                </div>
+            <div class="explanation" id="explanation">
+                <strong>Giải thích:</strong> <span id="explanation-text"></span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="score-display">Điểm: <span id="score">0</span></div>
+            <button id="next-btn">Câu tiếp theo ➜</button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="result-screen">
+        <h2 style="color: var(--primary-color)">Chúc Mừng Năm Mới!</h2>
+        <p>Bạn đã hoàn thành bài thi trắc nghiệm.</p>
+        <div>Số điểm của bạn:</div>
+        <div class="result-score"><span id="final-score">0</span> / <span id="total-questions">0</span></div>
+        <p id="result-message"></p>
+        <button class="restart-btn" onclick="location.reload()">Làm lại bài thi</button>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu câu hỏi lấy từ phần phân tích trước
+    const questions = [
+        {
+            question: "Theo chiết tự chữ Hán, ý nghĩa của cụm từ 'Tết Nguyên Đán' là gì?",
+            hint: "Chú ý chữ 'Nguyên' (đầu tiên) và 'Đán' (buổi sáng).",
+            answers: [
+                { text: "Đêm trăng tròn đầu tiên", correct: false },
+                { text: "Buổi sáng đầu tiên của năm mới", correct: true },
+                { text: "Ngày hội sum họp gia đình", correct: false },
+                { text: "Lễ hội đón mùa xuân", correct: false }
+            ],
+            rationale: "'Nguyên' là khởi đầu, 'Đán' là buổi sáng sớm. Nguyên Đán là buổi sáng khởi đầu của một năm."
+        },
+        {
+            question: "Món 'Canh khổ qua' trong mâm cỗ Tết miền Nam mang ý nghĩa gì?",
+            hint: "Liên tưởng đến tên gọi của loại quả này.",
+            answers: [
+                { text: "Mong mọi sự sung túc", correct: false },
+                { text: "Giải nhiệt cơ thể", correct: false },
+                { text: "Cầu mong cái khổ đi qua", correct: true },
+                { text: "Nhắc nhở sự chịu thương chịu khó", correct: false }
+            ],
+            rationale: "Người miền Nam chơi chữ 'khổ qua' - nghĩa là mong cái khổ của năm cũ sẽ qua đi để đón điều may mắn."
+        },
+        {
+            question: "Miền Nam thường kiêng loại quả nào trong mâm ngũ quả?",
+            hint: "Tên loại quả này nghe giống một từ chỉ sự thất bại.",
+            answers: [
+                { text: "Quả Lựu", correct: false },
+                { text: "Quả Chuối", correct: true },
+                { text: "Quả Xoài", correct: false },
+                { text: "Quả Dừa", correct: false }
+            ],
+            rationale: "Kiêng chuối vì phát âm giống 'chúi' (chúi nhủi, làm ăn không ngóc đầu lên được)."
+        },
+        {
+            question: "Tại sao người Việt thường chưng hoa Đào ngày Tết?",
+            hint: "Liên quan đến truyền thuyết hai vị thần Trà và Uất Lũy.",
+            answers: [
+                { text: "Để cầu tình duyên", correct: false },
+                { text: "Để xua đuổi tà ma", correct: true },
+                { text: "Để thể hiện giàu sang", correct: false },
+                { text: "Để báo hiệu mùa xuân", correct: false }
+            ],
+            rationale: "Tương truyền hoa Đào là nơi trú ngụ của thần linh có khả năng chế ngự ma quỷ."
+        },
+        {
+            question: "Món 'Thịt kho tàu' với trứng thể hiện triết lý gì?",
+            hint: "Hình dáng vuông của thịt và tròn của trứng.",
+            answers: [
+                { text: "Tiết kiệm thực phẩm", correct: false },
+                { text: "Giao thoa văn hóa phương Tây", correct: false },
+                { text: "Hài hòa âm dương, vuông tròn", correct: true },
+                { text: "Sự đoàn kết xóm làng", correct: false }
+            ],
+            rationale: "Miếng thịt vuông (đất/âm), trứng tròn (trời/dương) thể hiện mong ước năm mới trọn vẹn, cân bằng."
+        },
+        {
+            question: "Ngày 23 tháng Chạp là ngày lễ gì?",
+            hint: "Tiễn một vị thần cai quản bếp núc.",
+            answers: [
+                { text: "Cúng Tất niên", correct: false },
+                { text: "Đưa ông Táo về trời", correct: true },
+                { text: "Dựng cây Nêu", correct: false },
+                { text: "Cúng Giao thừa", correct: false }
+            ],
+            rationale: "Ngày 23 tháng Chạp là ngày tiễn Táo Quân lên thiên đình báo cáo."
+        },
+        {
+            question: "Điền vào câu tục ngữ: 'Mùng một Tết cha, mùng hai Tết mẹ, mùng ba...'",
+            hint: "Truyền thống tôn sư trọng đạo.",
+            answers: [
+                { text: "Tết bạn", correct: false },
+                { text: "Tết thầy", correct: true },
+                { text: "Tết vợ", correct: false },
+                { text: "Tết con", correct: false }
+            ],
+            rationale: "Mùng ba Tết thầy - nhắc nhở nhớ ơn người dạy dỗ mình."
+        },
+         {
+            question: "Kiêng kỵ nào thường được thực hiện vào sáng mùng 1 Tết?",
+            hint: "Liên quan đến việc vệ sinh nhà cửa.",
+            answers: [
+                { text: "Không tắm gội", correct: false },
+                { text: "Không quét nhà", correct: true },
+                { text: "Không ăn cơm", correct: false },
+                { text: "Không ra khỏi nhà", correct: false }
+            ],
+            rationale: "Quét nhà ngày mùng 1 được cho là quét hết tài lộc ra khỏi cửa."
+        },
+        {
+            question: "Con giáp nào đứng đầu trong 12 con giáp?",
+            hint: "Loài vật nhỏ bé nhưng thông minh.",
+            answers: [
+                { text: "Sửu (Trâu)", correct: false },
+                { text: "Dần (Hổ)", correct: false },
+                { text: "Thìn (Rồng)", correct: false },
+                { text: "Tý (Chuột)", correct: true }
+            ],
+            rationale: "Tý (Chuột) là con giáp đứng đầu trong chu kỳ 12 con giáp."
+        },
+        {
+            question: "Lễ hội Chùa Hương thuộc tỉnh/thành nào?",
+            hint: "Nằm ở khu vực huyện Mỹ Đức.",
+            answers: [
+                { text: "Ninh Bình", correct: false },
+                { text: "Hà Nội", correct: true },
+                { text: "Bắc Ninh", correct: false },
+                { text: "Quảng Ninh", correct: false }
+            ],
+            rationale: "Chùa Hương thuộc huyện Mỹ Đức, Hà Nội."
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById('question');
+    const hintEl = document.getElementById('hint');
+    const optionsEl = document.getElementById('options');
+    const nextBtn = document.getElementById('next-btn');
+    const scoreEl = document.getElementById('score');
+    const progressEl = document.getElementById('progress');
+    const explanationEl = document.getElementById('explanation');
+    const explanationTextEl = document.getElementById('explanation-text');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const finalScoreEl = document.getElementById('final-score');
+    const totalQuestionsEl = document.getElementById('total-questions');
+    const resultMessageEl = document.getElementById('result-message');
+
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        resetState();
+        let currentQuestion = questions[currentQuestionIndex];
+        questionEl.innerText = `Câu ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+        hintEl.innerText = `💡 Gợi ý: ${currentQuestion.hint}`;
+        
+        // Cập nhật thanh tiến trình
+        let progress = ((currentQuestionIndex) / questions.length) * 100;
+        progressEl.style.width = `${progress}%`;
+
+        currentQuestion.answers.forEach(answer => {
+            const button = document.createElement('button');
+            button.innerText = answer.text;
+            button.classList.add('option-btn');
+            if (answer.correct) {
+                button.dataset.correct = answer.correct;
+            }
+            button.addEventListener('click', selectAnswer);
+            optionsEl.appendChild(button);
+        });
+    }
+
+    function resetState() {
+        nextBtn.style.display = 'none';
+        explanationEl.style.display = 'none';
+        while (optionsEl.firstChild) {
+            optionsEl.removeChild(optionsEl.firstChild);
+        }
+    }
+
+    function selectAnswer(e) {
+        const selectedBtn = e.target;
+        const isCorrect = selectedBtn.dataset.correct === "true";
+        
+        if (isCorrect) {
+            selectedBtn.classList.add('correct');
+            score++;
+            scoreEl.innerText = score;
+        } else {
+            selectedBtn.classList.add('wrong');
+        }
+
+        // Hiển thị đáp án đúng và khóa các nút
+        Array.from(optionsEl.children).forEach(button => {
+            if (button.dataset.correct === "true") {
+                button.classList.add('correct');
+            }
+            button.disabled = true;
+        });
+
+        // Hiển thị giải thích
+        explanationTextEl.innerText = questions[currentQuestionIndex].rationale;
+        explanationEl.style.display = 'block';
+        nextBtn.style.display = 'block';
+    }
+
+    nextBtn.addEventListener('click', () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
+        } else {
+            showScore();
+        }
+    });
+
+    function showScore() {
+        quizScreen.style.display = 'none';
+        resultScreen.style.display = 'block';
+        finalScoreEl.innerText = score;
+        totalQuestionsEl.innerText = questions.length;
+        
+        let message = "";
+        const percentage = (score / questions.length) * 100;
+        if (percentage === 100) message = "Xuất sắc! Bạn là chuyên gia về Tết Việt!";
+        else if (percentage >= 70) message = "Rất tốt! Bạn rất am hiểu văn hóa truyền thống.";
+        else if (percentage >= 50) message = "Khá tốt. Hãy tìm hiểu thêm để Tết thêm vui nhé!";
+        else message = "Cần cố gắng thêm. Hãy đọc lại các tài liệu văn hóa Tết nhé!";
+        
+        resultMessageEl.innerText = message;
+    }
+
+    // Bắt đầu ứng dụng
+    startQuiz();
+
+</script>
+
+</body>
+</html>

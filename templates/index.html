@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập - Rung Chuông Vàng Xuân Kết Nối</title>
+    <style>
+        :root {
+            --primary-color: #d32f2f;
+            /* Đỏ Tết */
+            --secondary-color: #ffca28;
+            /* Vàng Mai */
+            --text-color: #333;
+            --bg-color: #fff8e1;
+            --accent-color: #b71c1c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            background-image: radial-gradient(#ffca28 10%, transparent 11%), radial-gradient(#ffca28 10%, transparent 11%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .login-card {
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+            border: 4px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card::before {
+            content: "🌸";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            font-size: 60px;
+            opacity: 0.5;
+            transform: rotate(-20deg);
+        }
+
+        .login-card::after {
+            content: "🌸";
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            font-size: 60px;
+            opacity: 0.5;
+            transform: rotate(20deg);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            /* Fix padding issue */
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 5px rgba(255, 202, 40, 0.5);
+        }
+
+        .btn-start {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+        }
+
+        .btn-start:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <h1>Rung Chuông Vàng<br><span style="font-size: 0.7em; color: #555;">Xuân Kết Nối</span></h1>
+
+        <div class="form-group">
+            <label for="student-name">Họ và Tên</label>
+            <input type="text" id="student-name" placeholder="Nhập họ tên của bạn..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="class-name">Lớp</label>
+            <input type="text" id="class-name" placeholder="Ví dụ: 12A1..." required>
+        </div>
+
+        <button class="btn-start" onclick="startExam()">Bắt Đầu Thi</button>
+        <div class="error-message" id="error-msg">Vui lòng nhập đầy đủ thông tin!</div>
+    </div>
+
+    <script>
+        function startExam() {
+            const name = document.getElementById('student-name').value.trim();
+            const className = document.getElementById('class-name').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!name || !className) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Lưu thông tin vào localStorage để dùng sang trang sau
+            localStorage.setItem('studentName', name);
+            localStorage.setItem('className', className);
+
+            // Chuyển hướng
+            window.location.href = '/quiz';
+        }
+    </script>
+
+</body>
+
+</html>
