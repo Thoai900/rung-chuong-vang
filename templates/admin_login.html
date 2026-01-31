@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Rung Chuông Vàng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .btn-google {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+
+        .btn-google:hover {
+            background-color: #357ae8;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <h1>Quản Trị Viên</h1>
+        <p>Đăng nhập bằng tài khoản Google để tiếp tục</p>
+
+        <button class="btn-google" onclick="signInWithGoogle()">
+            Đăng nhập với Google
+        </button>
+        <div id="error-msg" class="error"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC37DP0AoXufMd3YvtB0EZsrXszfxyFsXU",
+            authDomain: "rung-chuong-vang-admin.firebaseapp.com",
+            projectId: "rung-chuong-vang-admin",
+            storageBucket: "rung-chuong-vang-admin.firebasestorage.app",
+            messagingSenderId: "302787431244",
+            appId: "1:302787431244:web:c16e16f9932105f1d39de9",
+            measurementId: "G-KW39Y4DG2C"
+        };
+
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch (e) {
+            document.getElementById('error-msg').innerText = "Chưa cấu hình Firebase! Xem hướng dẫn FIREBASE_SETUP.md";
+            console.error(e);
+        }
+
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    // Send email to backend to create session
+                    fetch('/api/admin/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: user.email })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.role) {
+                                window.location.href = '/admin/dashboard';
+                            } else {
+                                document.getElementById('error-msg').innerText = "Lỗi đăng nhập!";
+                            }
+                        });
+                }).catch((error) => {
+                    console.error(error);
+                    document.getElementById('error-msg').innerText = error.message;
+                });
+        }
+    </script>
+
+</body>
+
+</html>

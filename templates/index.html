@@ -4,83 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập - Rung Chuông Vàng Xuân Kết Nối</title>
+    <title>Rung Chuông Vàng - Xuân 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #d32f2f;
-            /* Đỏ Tết */
-            --secondary-color: #ffca28;
-            /* Vàng Mai */
-            --text-color: #333;
-            --bg-color: #fff8e1;
-            --accent-color: #b71c1c;
+            --bg-color: #FFF9E6;
+            /* Cream */
+            --primary-red: #FF4B4B;
+            --primary-red-dark: #cc0000;
+            --primary-yellow: #FFC700;
+            --text-color: #4B4B4B;
+            --card-bg: #FFFFFF;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--primary-color);
-            background-image: radial-gradient(#ffca28 10%, transparent 11%), radial-gradient(#ffca28 10%, transparent 11%);
-            background-size: 30px 30px;
-            background-position: 0 0, 15px 15px;
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            background-image:
+                radial-gradient(var(--primary-yellow) 15%, transparent 16%),
+                radial-gradient(var(--primary-red) 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            background-attachment: fixed;
+            opacity: 1;
+        }
+
+        /* Make background pattern subtle */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-color);
+            opacity: 0.92;
+            z-index: -1;
         }
 
         .login-card {
-            background-color: #fff;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            background-color: var(--card-bg);
             width: 90%;
-            max-width: 450px;
+            max-width: 420px;
             padding: 40px;
             text-align: center;
-            border: 4px solid var(--secondary-color);
+            border-radius: 20px;
+            border: 3px solid #E5E5E5;
+            box-shadow: 0 8px 0 #E5E5E5;
+            /* 3D Shadow Effect */
             position: relative;
-            overflow: hidden;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-card::before {
-            content: "🌸";
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            font-size: 60px;
-            opacity: 0.5;
-            transform: rotate(-20deg);
-        }
-
-        .login-card::after {
-            content: "🌸";
-            position: absolute;
-            bottom: -10px;
-            right: -10px;
-            font-size: 60px;
-            opacity: 0.5;
-            transform: rotate(20deg);
+            transform: translateY(0);
+            transition: transform 0.3s;
         }
 
         h1 {
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            font-size: 28px;
+            font-weight: 900;
+            font-size: 2.2rem;
+            color: var(--primary-red);
+            margin: 0 0 10px 0;
             text-transform: uppercase;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px #FFC700;
+        }
+
+        .subtitle {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #888;
+            margin-bottom: 30px;
         }
 
         .form-group {
@@ -91,54 +88,91 @@
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--text-color);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            color: #4B4B4B;
         }
 
-        input[type="text"] {
+        input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 15px;
+            border: 2px solid #E5E5E5;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            font-weight: 700;
             box-sizing: border-box;
-            /* Fix padding issue */
-            transition: border-color 0.3s;
+            background: #F7F7F7;
+            transition: all 0.2s;
         }
 
-        input[type="text"]:focus {
-            border-color: var(--secondary-color);
+        input:focus {
             outline: none;
-            box-shadow: 0 0 5px rgba(255, 202, 40, 0.5);
+            border-color: var(--primary-yellow);
+            background: #fff;
+            box-shadow: 0 4px 0 rgba(255, 199, 0, 0.2);
         }
 
         .btn-start {
-            background-color: var(--primary-color);
+            background-color: var(--primary-red);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
+            padding: 18px;
             width: 100%;
-            transition: all 0.3s;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 800;
             text-transform: uppercase;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            margin-top: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 var(--primary-red-dark);
+            transition: all 0.1s;
+            margin-top: 15px;
+        }
+
+        .btn-start:active {
+            box-shadow: 0 0 0 var(--primary-red-dark);
+            transform: translateY(5px);
         }
 
         .btn-start:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .btn-start:disabled {
+            background-color: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .mascot {
+            font-size: 80px;
+            margin-bottom: -10px;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
+            color: var(--primary-red);
+            font-weight: 800;
+            margin-top: 20px;
             display: none;
+            background: #FFE5E5;
+            padding: 10px;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -146,39 +180,78 @@
 <body>
 
     <div class="login-card">
-        <h1>Rung Chuông Vàng<br><span style="font-size: 0.7em; color: #555;">Xuân Kết Nối</span></h1>
+        <div class="mascot">🦁</div> <!-- Lân Sư Rồng Emoji -->
+        <h1>Rung Chuông Vàng</h1>
+        <div class="subtitle">Xuân Kết Nối 2026</div>
 
         <div class="form-group">
-            <label for="student-name">Họ và Tên</label>
-            <input type="text" id="student-name" placeholder="Nhập họ tên của bạn..." required>
+            <label for="student-name">Tên của bạn</label>
+            <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn A">
         </div>
 
         <div class="form-group">
             <label for="class-name">Lớp</label>
-            <input type="text" id="class-name" placeholder="Ví dụ: 12A1..." required>
+            <input type="text" id="class-name" placeholder="Ví dụ: 12A1">
         </div>
 
-        <button class="btn-start" onclick="startExam()">Bắt Đầu Thi</button>
-        <div class="error-message" id="error-msg">Vui lòng nhập đầy đủ thông tin!</div>
+        <button class="btn-start" onclick="login()">Bắt Đầu Ngay</button>
+        <div class="error-message" id="error-msg"></div>
+
+        <div style="margin-top: 20px; font-size: 0.9rem;">
+            <a href="/admin/login" style="color: #aaa; text-decoration: none; font-weight: 700;">Quản Trị Viên 🔒</a>
+        </div>
     </div>
 
     <script>
-        function startExam() {
+        async function login() {
             const name = document.getElementById('student-name').value.trim();
             const className = document.getElementById('class-name').value.trim();
             const errorMsg = document.getElementById('error-msg');
+            const btn = document.querySelector('.btn-start');
 
             if (!name || !className) {
-                errorMsg.style.display = 'block';
+                showError("Bạn quên nhập tên hoặc lớp rồi!");
                 return;
             }
 
-            // Lưu thông tin vào localStorage để dùng sang trang sau
-            localStorage.setItem('studentName', name);
-            localStorage.setItem('className', className);
+            btn.innerText = "Đang vào...";
+            btn.disabled = true;
 
-            // Chuyển hướng
-            window.location.href = '/quiz';
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name, group: className })
+                });
+
+                if (response.ok) {
+                    localStorage.setItem('studentName', name);
+                    localStorage.setItem('className', className);
+                    window.location.href = '/dashboard';
+                } else {
+                    showError("Lỗi hệ thống, thử lại nhé!");
+                    btn.innerText = "Bắt Đầu Ngay";
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error(error);
+                showError("Không kết nối được server!");
+                btn.innerText = "Bắt Đầu Ngay";
+                btn.disabled = false;
+            }
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.innerText = msg;
+            el.style.display = 'block';
+
+            // Shake effect
+            const card = document.querySelector('.login-card');
+            card.style.transform = 'translateX(10px)';
+            setTimeout(() => { card.style.transform = 'translateX(-10px)'; }, 100);
+            setTimeout(() => { card.style.transform = 'translateX(10px)'; }, 200);
+            setTimeout(() => { card.style.transform = 'translateY(0)'; }, 300);
         }
     </script>
 

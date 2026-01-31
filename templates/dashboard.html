@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn Chủ Đề</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FFF9E6;
+            /* Cream */
+            --primary-red: #FF4B4B;
+            --primary-yellow: #FFC700;
+            --primary-blue: #1CB0F6;
+            --primary-green: #58CC02;
+            --text-color: #4B4B4B;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            max-width: 1000px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-weight: 900;
+            font-size: 2rem;
+            color: var(--primary-red);
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 #FFC700;
+        }
+
+        .user-pill {
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 800;
+            border: 2px solid #E5E5E5;
+            box-shadow: 0 4px 0 #E5E5E5;
+        }
+
+        /* Grid Layout */
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .topic-card {
+            background: #fff;
+            border: 2px solid #E5E5E5;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 6px 0 #E5E5E5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 200px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            background-color: #FEFEFE;
+            border-color: var(--primary-blue);
+        }
+
+        .topic-card:active {
+            transform: translateY(2px);
+            box-shadow: 0 0 0 #E5E5E5;
+        }
+
+        /* Distinct Colors for Cards (nth-child logic via JS or random) */
+
+        .topic-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .topic-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            color: #4B4B4B;
+        }
+
+        .loader {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-weight: 800;
+            color: #888;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="header-title">
+            <h1>Chủ Đề Ngày Tết</h1>
+        </div>
+        <div class="user-pill">
+            👤 <span id="student-display">...</span>
+        </div>
+    </div>
+
+    <div class="topic-grid" id="category-container">
+        <div class="loader">Đang tải chủ đề...</div>
+    </div>
+
+    <script>
+        const studentName = localStorage.getItem('studentName');
+        if (!studentName) window.location.href = '/';
+        document.getElementById('student-display').innerText = studentName;
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                const categories = await response.json();
+                const container = document.getElementById('category-container');
+                container.innerHTML = '';
+
+                // Icons mapping
+                const icons = {
+                    'Phong tục ngày Tết': '🧧', // Red Envelope
+                    'Ý nghĩa các món ăn': '🍖', // Meat on bone/food
+                    'Loài hoa': '🌸', // Flower
+                    'Ngày tết trong văn học': '📜', // Scroll
+                    'Ca dao': '🎋', // Tanabata/Bamboo
+                    'Kiến thức xã hội': '🌏' // Globe
+                };
+
+                // Color mapping (borders/shadows) could be here, but using uniform style for cleanliness
+
+                categories.forEach((cat, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'topic-card';
+                    card.onclick = () => startQuiz(cat);
+
+                    const icon = icons[cat] || '✨';
+
+                    card.innerHTML = `
+                        <div class="topic-icon">${icon}</div>
+                        <div class="topic-title">${cat}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error(error);
+                document.getElementById('category-container').innerHTML = '<div class="loader">Lỗi tải dữ liệu 😢</div>';
+            }
+        }
+
+        function startQuiz(category) {
+            localStorage.setItem('selectedCategory', category);
+            window.location.href = `/quiz?category=${encodeURIComponent(category)}`;
+        }
+
+        loadCategories();
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            background: #f4f4f9;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #333;
+            color: white;
+            height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .nav-item {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #555;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            background: #FFC700;
+            color: #000;
+        }
+
+        .btn-delete {
+            background: #FF4B4B;
+        }
+
+        .btn-approve {
+            background: #58CC02;
+        }
+
+        .btn-reject {
+            background: #FF4B4B;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h3>Quản Trị</h3>
+        <div class="nav-item active" onclick="showTab('questions')">Ngân Hàng Câu Hỏi</div>
+        {% if role == 'super_admin' %}
+        <div class="nav-item" onclick="showTab('approvals')">Phê Duyệt Thay Đổi</div>
+        {% endif %}
+        <div class="nav-item" style="margin-top: auto; color: #aaa;" onclick="alert('Đăng xuất chưa làm!')">Đăng Xuất
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Question Bank Tab -->
+        <div id="tab-questions">
+            <h2>Ngân Hàng Câu Hỏi</h2>
+            <div class="card">
+                <button class="btn" style="background:#333;" onclick="alert('Tính năng Thêm Mới đang phát triển!')">+
+                    Thêm Câu Hỏi</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Chủ Đề</th>
+                            <th>Câu Hỏi</th>
+                            <th>Đáp Án</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="question-list">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Approvals Tab -->
+        <div id="tab-approvals" class="hidden">
+            <h2>Phê Duyệt Thay Đổi (Super Admin)</h2>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Người Yêu Cầu</th>
+                            <th>Hành Động</th>
+                            <th>Nội Dung</th>
+                            <th>Xử Lý</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approval-list">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const role = "{{ role }}";
+
+        function showTab(tabName) {
+            document.getElementById('tab-questions').classList.add('hidden');
+            document.getElementById('tab-approvals').classList.add('hidden');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+        }
+
+        async function loadQuestions() {
+            const res = await fetch('/api/questions');
+            const data = await res.json();
+            const tbody = document.getElementById('question-list');
+            tbody.innerHTML = '';
+
+            data.forEach(q => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${q.id}</td>
+                    <td>${q.category}</td>
+                    <td>${q.content}</td>
+                    <td>${q.answer}</td>
+                    <td>
+                        <button class="btn btn-edit" onclick="requestEdit(${q.id})">Sửa</button>
+                        <button class="btn btn-delete" onclick="requestDelete(${q.id})">Xóa</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadPending() {
+            if (role !== 'super_admin') return;
+            const res = await fetch('/api/admin/pending');
+            const data = await res.json();
+            const tbody = document.getElementById('approval-list');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) tbody.innerHTML = '<tr><td colspan="4">Không có yêu cầu nào chờ duyệt.</td></tr>';
+
+            data.forEach(req => {
+                const tr = document.createElement('tr');
+                const content = JSON.parse(req.new_content_json || '{}');
+
+                tr.innerHTML = `
+                    <td>${req.admin_email}</td>
+                    <td><b>${req.action_type}</b> ID: ${req.question_id || 'NEW'}</td>
+                    <td>
+                        <small>
+                        Q: ${content.content || 'N/A'}<br>
+                        A: ${content.answer || 'N/A'}
+                        </small>
+                    </td>
+                    <td>
+                        <button class="btn btn-approve" onclick="process(${req.id}, 'APPROVE')">Duyệt</button>
+                        <button class="btn btn-reject" onclick="process(${req.id}, 'REJECT')">Từ chối</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function requestDelete(id) {
+            if (!confirm("Gửi yêu cầu XÓA câu hỏi này?")) return;
+            // In a real app, this would be an API call to '/api/admin/request_change'
+            // For MVP, we simulate or need to implement that API.
+            // Since I haven't implemented request_change API in app.py yet, I'll alert.
+            alert("Đã gửi yêu cầu Xóa tới Super Admin! (API Mock)");
+        }
+
+        function requestEdit(id) {
+            alert("Tính năng Sửa đang phát triển!");
+        }
+
+        async function process(id, action) {
+            if (!confirm(action === 'APPROVE' ? "Duyệt yêu cầu này?" : "Từ chối yêu cầu này?")) return;
+
+            await fetch('/api/admin/approve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ change_id: id, action: action })
+            });
+            loadPending();
+            loadQuestions(); // refresh
+        }
+
+        loadQuestions();
+        loadPending();
+    </script>
+
+</body>
+
+</html>

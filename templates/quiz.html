@@ -4,406 +4,477 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thi Đấu - Rung Chuông Vàng</title>
+    <title>Thi Đấu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary-color: #d32f2f;
-            --secondary-color: #ffca28;
-            --text-color: #333;
-            --bg-color: #fff8e1;
-            --timer-color: #e65100;
+            --bg-color: #FFF9E6;
+            --primary-red: #FF4B4B;
+            --primary-yellow: #FFC700;
+            --success-green: #58CC02;
+            --success-green-dark: #58a700;
+            --error-red: #FF4B4B;
+            --error-red-dark: #ea2b2b;
+            --text-color: #4B4B4B;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--primary-color);
-            background-image: radial-gradient(#ffca28 10%, transparent 11%), radial-gradient(#ffca28 10%, transparent 11%);
-            background-size: 30px 30px;
-            background-position: 0 0, 15px 15px;
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 10px;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .quiz-container {
-            background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 700px;
-            padding: 20px;
-            border: 2px solid var(--secondary-color);
-            position: relative;
-            min-height: 500px;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
+            gap: 20px;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .user-info {
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .timer-badge {
-            background-color: var(--secondary-color);
-            color: #000;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 18px;
+        /* Header / Progress */
+        .top-bar {
             display: flex;
             align-items: center;
-            gap: 5px;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 10px;
-            background-color: #eee;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--primary-color);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .question-content {
-            flex-grow: 1;
-        }
-
-        .question-text {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 20px;
-            text-align: center;
-            min-height: 60px;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-bottom: 20px;
         }
 
-        @media (max-width: 600px) {
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
+        .close-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #888;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 16px;
+            background-color: #E5E5E5;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success-green);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 10px;
+            right: 10px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+        }
+
+        /* Timer Badge */
+        .timer-badge {
+            background: #fff;
+            padding: 5px 10px;
+            border-radius: 10px;
+            border: 2px solid #E5E5E5;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        /* Question Box */
+        .question-box {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #3C3C3C;
+            text-align: left;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
         }
 
         .option-btn {
             background-color: #fff;
-            border: 2px solid #ddd;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
+            border: 2px solid #E5E5E5;
+            /* Light border */
+            border-bottom: 4px solid #E5E5E5;
+            /* 3D effect */
+            border-radius: 15px;
+            padding: 15px 20px;
             text-align: left;
-            font-size: 16px;
-            transition: all 0.2s;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: inherit;
+            color: #4B4B4B;
+            cursor: pointer;
+            transition: all 0.1s;
             position: relative;
-            overflow: hidden;
+        }
+
+        .option-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
         }
 
         .option-btn:hover:not(:disabled) {
-            background-color: #f9f9f9;
-            border-color: var(--secondary-color);
+            background-color: #F7F7F7;
         }
 
-        .option-btn.selected {
-            border-color: var(--primary-color);
-            background-color: #fff3e0;
-        }
-
+        /* States */
         .option-btn.correct {
-            background-color: #d4edda;
-            border-color: #28a745;
-            color: #155724;
+            border-color: var(--success-green-dark);
+            background-color: var(--success-green);
+            color: white;
         }
 
         .option-btn.wrong {
-            background-color: #f8d7da;
-            border-color: #dc3545;
-            color: #721c24;
+            border-color: var(--error-red-dark);
+            background-color: var(--error-red);
+            color: white;
         }
 
-        /* Countdown circle animation idea could go here, but simple bar for now */
-
-        .footer {
+        /* Next Button Area */
+        .footer-action {
+            margin-top: auto;
+            border-top: 2px solid #E5E5E5;
+            padding-top: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: auto;
         }
 
-        .score-board {
-            font-size: 18px;
-            font-weight: bold;
+        .score-pill {
+            font-weight: 800;
+            color: var(--primary-yellow);
+            font-size: 1.2rem;
+            -webkit-text-stroke: 1px #888;
         }
 
         #next-btn {
-            background-color: var(--primary-color);
+            background-color: var(--success-green);
             color: white;
             border: none;
-            padding: 10px 25px;
-            border-radius: 5px;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 15px;
+            border-bottom: 4px solid var(--success-green-dark);
+            text-transform: uppercase;
             cursor: pointer;
-            font-size: 16px;
             display: none;
-            /* Hidden until answered */
         }
 
-        /* Loading Overlay */
-        #loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            font-size: 20px;
-            color: var(--primary-color);
-            flex-direction: column;
+        #next-btn:active {
+            margin-top: 2px;
+            border-bottom-width: 2px;
         }
-
-        /* Result Modal/Overlay (simplification - redirect to leaderboard is better but show quick result first) */
     </style>
 </head>
 
 <body>
 
     <div class="quiz-container">
-        <div id="loading-overlay">
-            <div style="font-size: 40px;">🌸</div>
-            <div>Đang tải câu hỏi...</div>
+        <div class="top-bar">
+            <div class="close-btn" onclick="window.location.href='/dashboard'">✕</div>
+            <div class="progress-container">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
+            <div class="timer-badge" id="timer">15</div>
         </div>
 
-        <div class="header">
-            <div class="user-info">
-                <span id="display-name">Thí sinh</span> | <span id="display-class">Lớp</span>
-            </div>
-            <div class="timer-badge">
-                Clock: <span id="timer">15</span>s
-            </div>
+        <div class="question-box" id="question-text">
+            Đang tải...
         </div>
 
-        <div class="progress-bar-container">
-            <div class="progress-fill" id="progress-bar"></div>
+        <div class="options-grid" id="options-container">
+            <!-- Buttons injected here -->
         </div>
 
-        <div class="question-content">
-            <div class="question-text" id="question-text">
-                Câu hỏi sẽ hiện ở đây...
-            </div>
-
-            <div class="options-grid" id="options-container">
-                <!-- Options injected here -->
-            </div>
-        </div>
-
-        <div class="footer">
-            <div class="score-board">Điểm: <span id="score">0</span></div>
-            <button id="next-btn" onclick="nextQuestion()">Tiếp theo ➜</button>
+        <div class="footer-action">
+            <div class="score-pill">⭐ <span id="score">0</span></div>
+            <button id="next-btn" onclick="nextQuestion()">Tiếp Tục</button>
         </div>
     </div>
 
     <script>
-        // State
-        let questions = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let timerInterval;
-        let timeLeft = 15;
-        let startTime;
-        let isAnswered = false;
-
-        // User Data
+        // Config
         const studentName = localStorage.getItem('studentName');
         const className = localStorage.getItem('className');
+        if (!studentName) window.location.href = '/';
 
-        if (!studentName || !className) {
-            alert("Thông tin thí sinh không tìm thấy, vui lòng đăng nhập lại!");
-            window.location.href = '/';
-        }
+        // State
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let timer;
+        let timeLeft = 15;
+        let isAnswered = false;
+        let startTime;
 
-        document.getElementById('display-name').textContent = studentName;
-        document.getElementById('display-class').textContent = className;
+        // Load Data
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category');
 
-        // Init
-        async function initGame() {
+        async function init() {
+            let url = '/api/questions';
+            if (category) url += `?category=${encodeURIComponent(category)}`;
+
             try {
-                const response = await fetch('/api/questions');
-                questions = await response.json();
-
+                const res = await fetch(url);
+                questions = await res.json();
                 if (questions.length === 0) {
-                    alert("Không có câu hỏi nào trong hệ thống!");
+                    alert("Không có câu hỏi nào!");
+                    window.location.href = '/dashboard';
                     return;
                 }
-
-                document.getElementById('loading-overlay').style.display = 'none';
                 startTime = Date.now();
                 loadQuestion();
-            } catch (error) {
-                console.error(error);
-                alert("Lỗi tải câu hỏi!");
+            } catch (e) {
+                console.error(e);
+                alert("Lỗi kết nối!");
             }
         }
 
         function loadQuestion() {
-            if (currentQuestionIndex >= questions.length) {
+            if (currentIndex >= questions.length) {
                 finishGame();
                 return;
             }
 
-            const q = questions[currentQuestionIndex];
-            const questionText = document.getElementById('question-text');
-            const optionsContainer = document.getElementById('options-container');
-            const progressBar = document.getElementById('progress-bar');
-            const nextBtn = document.getElementById('next-btn');
+            const q = questions[currentIndex];
+            document.getElementById('question-text').innerText = q.content;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
 
             // Reset UI
-            questionText.textContent = `Câu ${currentQuestionIndex + 1}: ${q.content}`;
-            optionsContainer.innerHTML = '';
-            nextBtn.style.display = 'none';
             isAnswered = false;
+            document.getElementById('next-btn').style.display = 'none';
+            updateProgress();
 
-            // Progress
-            const percent = ((currentQuestionIndex) / questions.length) * 100;
-            progressBar.style.width = `${percent}%`;
+            if (q.type === 'tu_luan') {
+                // Short Answer UI
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.gap = '10px';
+                wrapper.style.flexDirection = 'column';
 
-            // Parse Options (Assumed format "A. ...; B. ...")
-            // If options are stored as a single string separated by semicolons or just raw text.
-            // Let's handle the format provided in init_db.py: "A. ...; B. ...; C. ...; D. ..."
-            let options = [];
-            if (q.options) {
-                options = q.options.split(';').map(o => o.trim());
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'answer-input';
+                input.placeholder = 'Nhập câu trả lời của bạn...';
+                input.style.padding = '15px';
+                input.style.borderRadius = '15px';
+                input.style.border = '2px solid #E5E5E5';
+                input.style.fontSize = '1.1rem';
+                input.style.fontFamily = 'inherit';
+                input.onkeydown = (e) => { if (e.key === 'Enter') checkShortAnswer(q.answer); };
+
+                const submitBtn = document.createElement('button');
+                submitBtn.innerText = 'Trả lời';
+                submitBtn.className = 'option-btn'; // Reuse style
+                submitBtn.style.textAlign = 'center';
+                submitBtn.style.background = '#FFC700'; // Yellow for action
+                submitBtn.style.color = '#000';
+                submitBtn.onclick = () => checkShortAnswer(q.answer);
+
+                wrapper.appendChild(input);
+                wrapper.appendChild(submitBtn);
+                container.appendChild(wrapper);
+
+                // Focus input
+                setTimeout(() => input.focus(), 100);
+
+            } else {
+                // Multiple Choice UI
+                let opts = q.options ? q.options.split(';').map(o => o.trim()) : [];
+                opts.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => checkAnswer(btn, opt, q.answer);
+                    container.appendChild(btn);
+                });
             }
 
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
-                btn.onclick = () => checkAnswer(btn, opt, q.answer);
-                optionsContainer.appendChild(btn);
-            });
-
-            // Start Timer
             startTimer();
         }
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            timeLeft = 15;
-            document.getElementById('timer').textContent = timeLeft;
+        function checkAnswer(btn, choice, correct) {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearInterval(timer);
 
-            timerInterval = setInterval(() => {
+            // Logic: Compare exact strings OR just the option prefix (A, B, C, D)
+            // Database has "A. Content" or just "A" sometimes?
+            // User reported issues. Let's make it robust.
+            // Split by '.' to get prefix.
+
+            const choicePrefix = choice.split('.')[0].trim().toUpperCase();
+            const correctPrefix = correct.split('.')[0].trim().toUpperCase();
+
+            // If the Full String matches OR the Prefix matches
+            const isCorrect = (choice === correct) || (choicePrefix === correctPrefix);
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                score += 10;
+                document.getElementById('score').innerText = score;
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#58CC02', '#FFC700', '#FF4B4B']
+                });
+
+                // Disable all
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(b => b.disabled = true);
+
+                const nextBtn = document.getElementById('next-btn');
+                nextBtn.style.display = 'block';
+                nextBtn.onclick = nextQuestion;
+
+            } else {
+                btn.classList.add('wrong');
+                // Disable all
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(b => b.disabled = true);
+
+                handleWrong(btn, correct);
+            }
+        }
+
+        function checkShortAnswer(correct) {
+            if (isAnswered) return;
+            const input = document.getElementById('answer-input');
+            const userVal = input.value.trim();
+
+            if (!userVal) return; // Don't submit empty
+
+            isAnswered = true;
+            clearInterval(timer);
+
+            // Loose comparison
+            // Check if user answer contains key part of correct answer or exact match
+            // For simple logic: Check exact case-insensitive match for now, or naive 'includes'
+            const isCorrect = userVal.toLowerCase() === correct.toLowerCase();
+
+            const btn = document.querySelector('.option-btn'); // The submit button
+
+            if (isCorrect) {
+                input.style.borderColor = '#58CC02';
+                input.style.backgroundColor = '#e6ffcc';
+                score += 10;
+                document.getElementById('score').innerText = score;
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#58CC02', '#FFC700', '#FF4B4B']
+                });
+                input.disabled = true;
+                btn.disabled = true;
+
+                const nextBtn = document.getElementById('next-btn');
+                nextBtn.style.display = 'block';
+                nextBtn.onclick = nextQuestion;
+
+            } else {
+                input.style.borderColor = '#FF4B4B';
+                input.style.backgroundColor = '#ffe6e6';
+                input.disabled = true;
+                btn.disabled = true;
+
+                // Show correct logic - alert or insert styled text
+                const feedback = document.createElement('div');
+                feedback.innerHTML = `Đáp án đúng: <strong>${correct}</strong>`;
+                feedback.style.color = '#FF4B4B';
+                feedback.style.marginTop = '10px';
+                feedback.style.fontWeight = 'bold';
+                input.parentElement.appendChild(feedback);
+
+                handleWrong(null, correct);
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 15;
+            document.getElementById('timer').innerText = timeLeft;
+            document.getElementById('timer').style.color = '#FF4B4B';
+
+            timer = setInterval(() => {
                 timeLeft--;
-                document.getElementById('timer').textContent = timeLeft;
+                document.getElementById('timer').innerText = timeLeft;
                 if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    handleTimeOut();
+                    clearInterval(timer);
+                    // Time out behavior
+                    const q = questions[currentIndex];
+                    if (q.type === 'tu_luan') {
+                        const input = document.getElementById('answer-input');
+                        if (input) input.disabled = true;
+                        checkShortAnswer(''); // Force fail
+                    } else {
+                        handleWrong(null, q.answer);
+                    }
                 }
             }, 1000);
         }
 
-        function checkAnswer(selectedBtn, selectedText, correctAnswer) {
-            if (isAnswered) return;
-            isAnswered = true;
-            clearInterval(timerInterval);
 
-            // Logic check: The answer in DB might be "B. Buổi sáng..." and selectedText is similar.
-            // Or we check if selectedText starts with the correct letter if format is standard.
-            // Simple string comparison for now.
 
-            // However, in init_db.py, 'answer' column stores the full string "B. Buổi sáng...".
-            // So direct comparison should work if strings match exactly.
 
-            const isCorrect = selectedText === correctAnswer; // Strict match might be risky if whitespace differs
-            // Let's try flexible match: first character (A/B/C/D) match or full string.
-
-            const selectedLetter = selectedText.charAt(0);
-            const correctLetter = correctAnswer.charAt(0);
-
-            // A robust check
-            const correct = (selectedText.trim() === correctAnswer.trim()) || (selectedLetter === correctLetter && selectedLetter.match(/[A-D]/));
-
-            if (correct) {
-                selectedBtn.classList.add('correct');
-                score += 10; // 10 points per question
-                document.getElementById('score').textContent = score;
-                // Play Correct Sound (Optional)
-            } else {
-                selectedBtn.classList.add('wrong');
-                // Highlight correct answer
-                const buttons = document.querySelectorAll('.option-btn');
-                buttons.forEach(btn => {
-                    if (btn.textContent.trim() === correctAnswer.trim() || btn.textContent.charAt(0) === correctLetter) {
-                        btn.classList.add('correct');
-                    }
-                });
-
-                // Survival Mode: End Game immediately?
-                // "Chế độ Rung Chuông Vàng (Sinh tồn): Sai 1 câu là dừng cuộc chơi ngay lập tức."
-                setTimeout(() => {
-                    alert(`Rất tiếc! Bạn đã trả lời sai. Trò chơi kết thúc.\nĐáp án đúng là: ${correctAnswer}`);
-                    finishGame();
-                }, 1000);
-                return; // Exit
-            }
-
-            document.getElementById('next-btn').style.display = 'block';
-        }
-
-        function handleTimeOut() {
-            isAnswered = true;
-            // Show correct answer
-            const q = questions[currentQuestionIndex];
-            const correctLetter = q.answer.charAt(0);
-
+        function handleWrong(wrongBtn, correct) {
+            // Highlight correct
             const buttons = document.querySelectorAll('.option-btn');
-            buttons.forEach(btn => {
-                if (btn.textContent.includes(q.answer) || btn.textContent.startsWith(correctLetter)) {
-                    btn.classList.add('correct');
+            const correctLetter = correct.charAt(0);
+
+            buttons.forEach(b => {
+                if (b.innerText.includes(correct) || b.innerText.startsWith(correctLetter)) {
+                    b.classList.add('correct');
                 }
             });
 
+            // Survival Mode -> Game Over
             setTimeout(() => {
-                alert("Hết giờ! Bạn đã bị loại.");
+                alert("Rất tiếc! Bạn đã dừng cuộc chơi 🥲");
                 finishGame();
-            }, 1000);
+            }, 1500);
         }
 
         function nextQuestion() {
-            currentQuestionIndex++;
+            currentIndex++;
             loadQuestion();
         }
 
-        async function finishGame() {
-            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+        function updateProgress() {
+            const pct = (currentIndex / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+        }
 
-            // Submit Results
+        async function finishGame() {
+            const timeSpent = Math.floor((Date.now() - startTime) / 1000);
             try {
                 await fetch('/api/submit', {
                     method: 'POST',
@@ -412,19 +483,14 @@
                         name: studentName,
                         group: className,
                         score: score,
-                        time_spent: totalTime
+                        time_spent: timeSpent
                     })
                 });
-                window.location.href = '/leaderboard';
-            } catch (e) {
-                console.error("Lỗi lưu kết quả", e);
-                alert("Có lỗi khi lưu kết quả!");
-                window.location.href = '/leaderboard'; // Go anyway
-            }
+            } catch (e) { }
+            window.location.href = '/leaderboard';
         }
 
-        // Start
-        initGame();
+        init();
 
     </script>
 
